@@ -12,7 +12,6 @@ import TournamentPairingsPage from './pages/TournamentPairingsPage';
 
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
 		<Box minH={"100vh"} bg={useColorModeValue("gray.100", "gray.900")}>

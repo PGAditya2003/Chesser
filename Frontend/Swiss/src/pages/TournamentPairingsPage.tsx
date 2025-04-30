@@ -120,7 +120,6 @@ const TournamentPairingsPage = () => {
     }
   };
   
-
   return (
     <Box minH="100vh" bg="blue.50" p={6} fontFamily="Roboto, sans-serif">
       <Heading mb={8} color="blue.700" textAlign="center">
