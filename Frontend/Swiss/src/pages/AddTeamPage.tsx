@@ -12,6 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 
+// Use environment variable for API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 interface Player {
   name: string;
   rating: number | ""; // "" for empty, number for real rating
@@ -36,7 +39,6 @@ const AddTeamPage = () => {
     } else {
       updatedPlayers[index].name = value;
     }
-    
     setPlayers(updatedPlayers);
   };
 
@@ -58,7 +60,7 @@ const AddTeamPage = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/tournaments/team/${id}/add-team`, {
+      const res = await fetch(`${API_BASE_URL}/api/tournaments/team/${id}/add-team`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -87,7 +89,11 @@ const AddTeamPage = () => {
 
       <FormControl mb={4}>
         <FormLabel fontWeight="bold">Team Name</FormLabel>
-        <Input value={teamName} onChange={(e) => setTeamName(e.target.value)} placeholder="Enter team name" />
+        <Input
+          value={teamName}
+          onChange={(e) => setTeamName(e.target.value)}
+          placeholder="Enter team name"
+        />
       </FormControl>
 
       <Heading size="sm" mb={2} mt={6} color="blue.600">

@@ -6,3 +6,4 @@ interface ImportMetaEnv {
     readonly env: ImportMetaEnv;
   }
   
+  /// <reference types="vite/client" />

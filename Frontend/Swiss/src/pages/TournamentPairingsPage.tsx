@@ -12,6 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 
+// ✅ Use environment variable
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 interface Team {
   _id: string;
   name: string;
@@ -20,7 +23,7 @@ interface Team {
 interface Pairing {
   teamA: Team;
   teamB: Team;
-  result?: string; // e.g., "1-0", "0.5-0.5", etc.
+  result?: string;
 }
 
 interface Round {
@@ -38,9 +41,7 @@ const TournamentPairingsPage = () => {
 
   const fetchPairings = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/tournaments/team/${id}/pairings`
-      );
+      const res = await fetch(`${API_BASE_URL}/api/tournaments/team/${id}/pairings`);
       if (!res.ok) throw new Error("Failed to fetch pairings");
 
       const data = await res.json();
@@ -74,7 +75,7 @@ const TournamentPairingsPage = () => {
       teamBId,
       result,
     });
-  
+
     if (!teamAId || !teamBId || !result) {
       toast({
         title: "Invalid data to submit result",
@@ -84,29 +85,29 @@ const TournamentPairingsPage = () => {
       });
       return;
     }
-  
+
     try {
       const res = await fetch(
-        `http://localhost:5000/api/tournaments/team/${id}/pairings/result`,
+        `${API_BASE_URL}/api/tournaments/team/${id}/pairings/result`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ roundNumber, teamAId, teamBId, result }),
         }
       );
-  
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to submit result");
       }
-  
+
       toast({
         title: "Result submitted",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
-  
+
       navigate(`/tournament/${id}`);
       fetchPairings();
     } catch (err: any) {
@@ -119,7 +120,7 @@ const TournamentPairingsPage = () => {
       });
     }
   };
-  
+
   return (
     <Box minH="100vh" bg="blue.50" p={6} fontFamily="Roboto, sans-serif">
       <Heading mb={8} color="blue.700" textAlign="center">
@@ -157,55 +158,55 @@ const TournamentPairingsPage = () => {
                 <VStack spacing={3} align="stretch">
                   {round.pairings.map((pairing, idx) => (
                     <Box
-                    key={idx}
-                    bg="blue.50"
-                    p={3}
-                    borderRadius="md"
-                    border="1px solid"
-                    borderColor="blue.100"
-                  >
-                    <Text color="black" fontSize="md" mb={2}>
-                      {pairing.teamA.name} 🆚 {pairing.teamB.name !== "None" ? pairing.teamB.name : "— Bye"}
-                      {pairing.result && (
-                        <Text as="span" fontWeight="bold" color="teal.600">
-                          {" "}— Result: {pairing.result}
-                        </Text>
+                      key={idx}
+                      bg="blue.50"
+                      p={3}
+                      borderRadius="md"
+                      border="1px solid"
+                      borderColor="blue.100"
+                    >
+                      <Text color="black" fontSize="md" mb={2}>
+                        {pairing.teamA.name} 🆚{" "}
+                        {pairing.teamB.name !== "None" ? pairing.teamB.name : "— Bye"}
+                        {pairing.result && (
+                          <Text as="span" fontWeight="bold" color="teal.600">
+                            {" "}— Result: {pairing.result}
+                          </Text>
+                        )}
+                      </Text>
+
+                      {!pairing.result && pairing.teamB.name !== "None" && (
+                        <Flex gap={2} wrap="wrap">
+                          <Button
+                            size="sm"
+                            colorScheme="green"
+                            onClick={() =>
+                              submitResult(round.roundNumber, pairing.teamA._id, pairing.teamB._id, "1-0")
+                            }
+                          >
+                            {pairing.teamA.name} Wins
+                          </Button>
+                          <Button
+                            size="sm"
+                            colorScheme="green"
+                            onClick={() =>
+                              submitResult(round.roundNumber, pairing.teamA._id, pairing.teamB._id, "0-1")
+                            }
+                          >
+                            {pairing.teamB.name} Wins
+                          </Button>
+                          <Button
+                            size="sm"
+                            colorScheme="orange"
+                            onClick={() =>
+                              submitResult(round.roundNumber, pairing.teamA._id, pairing.teamB._id, "0.5-0.5")
+                            }
+                          >
+                            Draw
+                          </Button>
+                        </Flex>
                       )}
-                    </Text>
-                  
-                    {!pairing.result && pairing.teamB.name !== "None" && (
-                      <Flex gap={2} wrap="wrap">
-                        <Button
-                          size="sm"
-                          colorScheme="green"
-                          onClick={() =>
-                            submitResult(round.roundNumber, pairing.teamA._id, pairing.teamB._id, "1-0")
-                          }
-                        >
-                          {pairing.teamA.name} Wins
-                        </Button>
-                        <Button
-                          size="sm"
-                          colorScheme="green"
-                          onClick={() =>
-                            submitResult(round.roundNumber, pairing.teamA._id, pairing.teamB._id, "0-1")
-                          }
-                        >
-                          {pairing.teamB.name} Wins
-                        </Button>
-                        <Button
-                          size="sm"
-                          colorScheme="orange"
-                          onClick={() =>
-                            submitResult(round.roundNumber, pairing.teamA._id, pairing.teamB._id, "0.5-0.5")
-                          }
-                        >
-                          Draw
-                        </Button>
-                      </Flex>
-                    )}
-                  </Box>
-                  
+                    </Box>
                   ))}
                 </VStack>
               </Box>

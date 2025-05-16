@@ -24,40 +24,43 @@ const IndividualTournamentForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/tournaments/individual", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-      if (res.ok) {
-        toast({
-          title: "Individual tournament created!",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        setFormData({ tournamentName: "", location: "", date: "" });
-      } else {
-        toast({
-          title: "Error creating tournament",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    } catch (err) {
-      console.error(err);
+const handleSubmit = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/tournaments/individual`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
       toast({
-        title: "Server error",
+        title: "Individual tournament created!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      setFormData({ tournamentName: "", location: "", date: "" });
+    } else {
+      toast({
+        title: "Error creating tournament",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast({
+      title: "Server error",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+};
+
 
   return (
     <Box minH="100vh" bgGradient="linear(to-b, blue.500 50%, white 50%)">

@@ -28,6 +28,8 @@ import {
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 interface Player {
   _id: string;
   name: string;
@@ -69,9 +71,7 @@ const TournamentDetailsPage = () => {
 
   const fetchTeams = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/tournaments/team/${id}/teams`
-      );
+      const res = await fetch(`${API_BASE_URL}/api/tournaments/team/${id}/teams`);
       const data = await res.json();
       setTeams(data);
     } catch (error) {
@@ -87,14 +87,11 @@ const TournamentDetailsPage = () => {
 
   const handleAddTeam = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/tournaments/team/${id}/add-team`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: newTeamName }),
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/api/tournaments/team/${id}/add-team`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newTeamName }),
+      });
 
       if (!res.ok) throw new Error("Failed to add team");
 
@@ -129,10 +126,8 @@ const TournamentDetailsPage = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/tournaments/team/${id}/remove-team/${teamToDelete._id}`,
-        {
-          method: "DELETE",
-        }
+        `${API_BASE_URL}/api/tournaments/team/${id}/remove-team/${teamToDelete._id}`,
+        { method: "DELETE" }
       );
 
       if (!res.ok) throw new Error("Failed to delete team");
@@ -169,7 +164,10 @@ const TournamentDetailsPage = () => {
         <Button colorScheme="blue" onClick={onAddOpen}>
           ➕ Add Team
         </Button>
-        <Button colorScheme="teal" onClick={() => navigate(`/tournament/${id}/pairings`)}>
+        <Button
+          colorScheme="teal"
+          onClick={() => navigate(`/tournament/${id}/pairings`)}
+        >
           🔀 View Pairings
         </Button>
       </Flex>
@@ -184,51 +182,63 @@ const TournamentDetailsPage = () => {
         </Text>
       ) : (
         <Flex justify="center">
-          <Box maxW="1000px" w="full" bg="white" p={6} borderRadius="xl" boxShadow="lg">
-          <Table size="md">
-            <Thead bg="blue.200">
-              <Tr>
-                <Th color="gray.800" fontWeight="semibold">Team Name</Th>
-                <Th textAlign="center" color="gray.800">Played</Th>
-                <Th textAlign="center" color="gray.800">Wins</Th>
-                <Th textAlign="center" color="gray.800">Draws</Th>
-                <Th textAlign="center" color="gray.800">Losses</Th>
-                <Th textAlign="center" color="gray.800">Points</Th>
-                <Th textAlign="center" color="gray.800">Actions</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {[...teams]
-                .sort((a, b) => b.points - a.points)
-                .map((team, index) => (
-                  <Tr
-                    key={team._id}
-                    bg={index % 2 === 0 ? "gray.50" : "white"}
-                    _hover={{ bg: "blue.50", transform: "scale(1.005)", transition: "0.2s ease" }}
-                  >
-                    <Td color="gray.700" fontWeight="medium">{team.name}</Td>
-                    <Td color="gray.700" textAlign="center">{team.gamesPlayed}</Td>
-                    <Td color="green.600" textAlign="center" fontWeight="bold">{team.wins}</Td>
-                    <Td color="orange.600" textAlign="center">{team.draws}</Td>
-                    <Td color="red.600" textAlign="center">{team.losses}</Td>
-                    <Td color="blue.700" textAlign="center" fontWeight="bold">
-                      {team.points}
-                    </Td>
-                    <Td textAlign="center">
-                      <Button
-                        size="sm"
-                        colorScheme="red"
-                        variant="outline"
-                        onClick={() => confirmDeleteTeam(team)}
-                      >
-                        Delete
-                      </Button>
-                    </Td>
-                  </Tr>
-                ))}
-            </Tbody>
-          </Table>
-
+          <Box
+            maxW="1000px"
+            w="full"
+            bg="white"
+            p={6}
+            borderRadius="xl"
+            boxShadow="lg"
+          >
+            <Table size="md">
+              <Thead bg="blue.200">
+                <Tr>
+                  <Th color="gray.800" fontWeight="semibold">Team Name</Th>
+                  <Th textAlign="center" color="gray.800">Played</Th>
+                  <Th textAlign="center" color="gray.800">Wins</Th>
+                  <Th textAlign="center" color="gray.800">Draws</Th>
+                  <Th textAlign="center" color="gray.800">Losses</Th>
+                  <Th textAlign="center" color="gray.800">Points</Th>
+                  <Th textAlign="center" color="gray.800">Actions</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {[...teams]
+                  .sort((a, b) => b.points - a.points)
+                  .map((team, index) => (
+                    <Tr
+                      key={team._id}
+                      bg={index % 2 === 0 ? "gray.50" : "white"}
+                      _hover={{
+                        bg: "blue.50",
+                        transform: "scale(1.005)",
+                        transition: "0.2s ease",
+                      }}
+                    >
+                      <Td color="gray.700" fontWeight="medium">{team.name}</Td>
+                      <Td textAlign="center" color="gray.700">{team.gamesPlayed}</Td>
+                      <Td textAlign="center" color="green.600" fontWeight="bold">
+                        {team.wins}
+                      </Td>
+                      <Td textAlign="center" color="orange.600">{team.draws}</Td>
+                      <Td textAlign="center" color="red.600">{team.losses}</Td>
+                      <Td textAlign="center" color="blue.700" fontWeight="bold">
+                        {team.points}
+                      </Td>
+                      <Td textAlign="center">
+                        <Button
+                          size="sm"
+                          colorScheme="red"
+                          variant="outline"
+                          onClick={() => confirmDeleteTeam(team)}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
           </Box>
         </Flex>
       )}

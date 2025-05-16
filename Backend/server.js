@@ -288,6 +288,8 @@ app.get("/api/tournaments/team/:id/pairings", async (req, res) => {
     const rounds = [];
     const teamList = [...teams];
 
+    const rs = new Map();
+
     if (teamList.length % 2 !== 0) {
       teamList.push({ name: "None", _id: null }); // Bye team for odd numbers
     }
@@ -297,6 +299,18 @@ app.get("/api/tournaments/team/:id/pairings", async (req, res) => {
     for (let round = 0; round < numRounds; round++) {
       const pairings = [];
       const step = round + 1; // For round 1, step = 1; round 2, step = 2, and so on.
+      
+      // still EDITING < WORK IN PROGRESS ||||||| CODE RED
+      for(let i = 0; i<teamList.length ; i++){
+        for(let j = i+1 ; j<teamList.length ; j++){
+          const teamA = teamList[i];
+          const teamB = teamList[j];
+          if(rs.get(j) == null){
+            rs.add(j , []);
+          }
+          rs.get(j).push({teamA , teamB});
+        }
+      }
 
       // Rotate teams to generate new pairings each round
       for (let i = 0; i < teamList.length / 2; i++) {

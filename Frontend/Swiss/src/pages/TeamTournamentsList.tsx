@@ -10,6 +10,9 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
+// ✅ Use the correct env variable
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 interface Tournament {
   _id: string;
   tournamentName: string;
@@ -26,7 +29,7 @@ const TeamTournamentsList = () => {
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/tournaments/team");
+        const res = await fetch(`${API_BASE_URL}/api/tournaments/team`);
         const data = await res.json();
         setTournaments(data);
       } catch (error) {
